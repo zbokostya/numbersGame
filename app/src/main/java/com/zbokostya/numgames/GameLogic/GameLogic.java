@@ -12,7 +12,10 @@ import java.util.List;
 
 public class GameLogic {
     private static GameLogic instance;
-    private GameLogic() { }
+
+    private GameLogic() {
+    }
+
     public static synchronized GameLogic getInstance() {
         if (instance == null) {
             instance = new GameLogic();
@@ -21,68 +24,49 @@ public class GameLogic {
     }
 
     private int idFirstButtonPressed = -1;
-    private ArrayList<Button> buttonsList = new ArrayList<>();
-
-    //buttons int array
-    private ArrayList<Integer> arrInt = new ArrayList<>();
-
-
-    public void initArrays(List<Button> listButton, List<Integer> listInteger) {
-        setListButtons(listButton);
-        setListInt(listInteger);
-    }
-
-    private void setListButtons(List<Button> list) {
-        buttonsList.addAll(list);
-    }
-
-    private void setListInt(List<Integer> list) {
-        arrInt.addAll(list);
-    }
 
     private void setLastPressedButtonId(int id) {
         idFirstButtonPressed = id;
     }
 
-    public ArrayList<Integer> returnIntArray() {
-        return arrInt;
-    }
 
-    public ArrayList<Button> returnButtonArray() {
-        return buttonsList;
-    }
-
-    public void mainActivator(int idSecond) {
-        Log.d("1", idFirstButtonPressed + "");
-        Log.d("2", idSecond + "");
+    public void mainActivator(int idSecond, ArrayList<Button> buttonsList, ArrayList<Integer> intArrayList) {
+        Log.d("1", idSecond + "" + intArrayList.get(idSecond));
         Button btn1;
         Button btn2;
         if (idFirstButtonPressed == -1) {
             btn1 = buttonsList.get(idSecond);
             btn1.setBackgroundColor(Color.GREEN);
+            buttonsList.set(idSecond, btn1);
             setLastPressedButtonId(idSecond);
             return;
         }
-        if (idFirstButtonPressed == idSecond && idFirstButtonPressed != -1) {
+        if (idFirstButtonPressed == idSecond) {
             btn1 = buttonsList.get(idFirstButtonPressed);
             btn1.setBackgroundColor(Color.CYAN);
+            buttonsList.set(idSecond, btn1);
             idFirstButtonPressed = -1;
             return;
         }
         btn1 = buttonsList.get(idFirstButtonPressed);
         btn2 = buttonsList.get(idSecond);
-        if (deleteNumbers(idFirstButtonPressed, idSecond)) {
-            arrInt.set(idFirstButtonPressed, 0);
-            arrInt.set(idSecond, 0);
+        if (deleteNumbers(idFirstButtonPressed, idSecond, intArrayList)) {
+            intArrayList.set(idFirstButtonPressed, 0);
+            intArrayList.set(idSecond, 0);
             btn1.setBackgroundColor(Color.BLACK);
             btn2.setBackgroundColor(Color.BLACK);
+            btn1.setText(0 + "");
+            btn2.setText(0 + "");
+            buttonsList.set(idFirstButtonPressed, btn1);
+            buttonsList.set(idSecond, btn2);
         } else {
             btn1.setBackgroundColor(Color.CYAN);
+            buttonsList.set(idFirstButtonPressed, btn1);
         }
         idFirstButtonPressed = -1;
     }
 
-    private boolean deleteNumbers(int aId, int bId) {
+    private boolean deleteNumbers(int aId, int bId, ArrayList<Integer> intArrayList) {
         if (aId == bId) return false;
         if (aId > bId) {//if aId > bId swap to make | first < second
             int cnt = aId;
@@ -91,37 +75,37 @@ public class GameLogic {
         }
 
         //Если рядом(сверху вниз)
-        if (bId - 9 == aId && (arrInt.get(bId).equals(arrInt.get(aId)) || arrInt.get(bId) + arrInt.get(aId) == 10)) {
+        if (bId - 9 == aId && (intArrayList.get(bId).equals(intArrayList.get(aId)) || intArrayList.get(bId) + intArrayList.get(aId) == 10)) {
             return true;
         }
 
 
         //Если рядом(слева на право)
-        if (bId - 1 == aId && (arrInt.get(bId).equals(arrInt.get(aId)) || arrInt.get(bId - 1) + arrInt.get(aId) == 10)) {
+        if (bId - 1 == aId && (intArrayList.get(bId).equals(intArrayList.get(aId)) || intArrayList.get(bId - 1) + intArrayList.get(aId) == 10)) {
             return true;
         }
 
         boolean flag = true;
         //проверяем на на наличие нулей между левый и правым
         for (int j = 0; j <= bId - aId - 2; j++) {
-            if (!(arrInt.get(aId + 1 + j) == 0)) {
+            if (!(intArrayList.get(aId + 1 + j) == 0)) {
                 flag = false;
             }
         }
         if (flag) {
-            return arrInt.get(aId) + arrInt.get(bId) == 10 || arrInt.get(aId).equals(arrInt.get(bId));
+            return intArrayList.get(aId) + intArrayList.get(bId) == 10 || intArrayList.get(aId).equals(intArrayList.get(bId));
         }
 
         flag = true;
         //Проверка на нули сверху вниз
         int j;
         for (j = 0; j <= bId - aId - 18; j += 9) {
-            if (!(arrInt.get(aId + 9 + j) == 0)) {
+            if (!(intArrayList.get(aId + 9 + j) == 0)) {
                 flag = false;
             }
         }
         if (flag && j != 0) {
-            return arrInt.get(aId) + arrInt.get(bId) == 10 || arrInt.get(aId).equals(arrInt.get(bId));
+            return intArrayList.get(aId) + intArrayList.get(bId) == 10 || intArrayList.get(aId).equals(intArrayList.get(bId));
         }
 
         return false;

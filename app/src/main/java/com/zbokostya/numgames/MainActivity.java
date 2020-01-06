@@ -22,29 +22,39 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
 
     private TextView textViewTest;
-    Button secondAct;
-
+    Button gameStandart;
+    Button gameRandom;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        secondAct = findViewById(R.id.ButtonSecondActivity);
-        secondAct.setOnClickListener(oclBtn);
+
+        gameStandart = findViewById(R.id.ButtonGameStandart);
+        gameStandart.setOnClickListener(oclBtnStandart);
+        gameRandom = findViewById(R.id.ButtonGameRandom);
+        gameRandom.setOnClickListener(oclBtnRandom);
 
     }
 
 
-    View.OnClickListener oclBtn = new View.OnClickListener() {
+    View.OnClickListener oclBtnStandart = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             Intent intent = new Intent(getApplicationContext(), GameActivity.class);
+            intent.putExtra("TypeOfGameChoosed", 1);
             startActivity(intent);
         }
     };
 
-
-
+    View.OnClickListener oclBtnRandom = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(getApplicationContext(), GameActivity.class);
+            intent.putExtra("TypeOfGameChoosed", 2);
+            startActivity(intent);
+        }
+    };
 
 }

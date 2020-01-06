@@ -9,6 +9,7 @@ import android.widget.Button;
 
 import com.zbokostya.numgames.GameActivity;
 import com.zbokostya.numgames.GameLogic.GameLogic;
+import com.zbokostya.numgames.MainActivity;
 import com.zbokostya.numgames.R;
 
 import java.util.ArrayList;
@@ -20,13 +21,11 @@ import androidx.recyclerview.widget.RecyclerView;
 public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumbersViewHolder> {
     private ArrayList<Button> buttonsArrayList = new ArrayList<>();
     private ArrayList<Integer> intArrayList = new ArrayList<>();
-    private GameLogic gameLogic;
+    private GameLogic gameLogic = GameLogic.getInstance();
 
     @NonNull
     @Override
     public NumbersViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        gameLogic = GameLogic.getInstance();
-        //gameLogic.initArrays(buttonsArrayList, intArrayList);
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.buttons_layout, parent, false);
         return new NumbersViewHolder(view);
@@ -42,12 +41,18 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumbersVie
         return buttonsArrayList.size();
     }
 
+    public void addToIntArr(ArrayList<Integer> intArray){
+        intArrayList.addAll(intArray);
+    }
 
-    public void addItems(Collection<Button> button) {
-        buttonsArrayList.addAll(button);
-        for (Button btn : button) {
-            intArrayList.add(btn.getId());
-        }
+
+    public void addItems(Collection<Button> buttons) {
+        buttonsArrayList.addAll(buttons);
+        notifyDataSetChanged();
+    }
+    public void setItems(Collection<Button> buttons) {
+        buttonsArrayList.clear();
+        buttonsArrayList.addAll(buttons);
         notifyDataSetChanged();
     }
 
@@ -67,36 +72,43 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumbersVie
         intArrayList.clear();
     }
 
+    public  ArrayList<Integer> getIntArrayList(){
+        return intArrayList;
+    }
+    public  ArrayList<Button> getButtonsArrayList(){
+        return buttonsArrayList;
+    }
+    public  void setIntArrayList( ArrayList<Integer> intList){
+        intArrayList.clear();
+        intArrayList.addAll(intList);
+        notifyDataSetChanged();
+    }
 
     class NumbersViewHolder extends RecyclerView.ViewHolder {
         private Button addedButton;
 
-        public NumbersViewHolder(View itemView) {
+        NumbersViewHolder(View itemView) {
             super(itemView);
             addedButton = itemView.findViewById(R.id.Button);
         }
 
-        public void bind(Button button) {
+        void bind(Button button) {
             // addedButton.setHeight(button.getHeight());
             addedButton.setText(button.getText());
-            addedButton.setBackgroundColor(Color.CYAN);
+            addedButton.setBackgroundDrawable(button.getBackground());
             addedButton.setId(button.getId());
             addedButton.setOnClickListener(oclBtn);
         }
     }
 
-    View.OnClickListener oclBtn = new View.OnClickListener() {
+    private View.OnClickListener oclBtn = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            gameLogic.initArrays(buttonsArrayList, intArrayList);
-            gameLogic.mainActivator(v.getId());
-            Log.d("123", v.getId() + "");
-            buttonsArrayList.clear();
-            intArrayList.clear();
-            buttonsArrayList = gameLogic.returnButtonArray();
-            intArrayList = gameLogic.returnIntArray();
+            gameLogic.mainActivator(v.getId(), buttonsArrayList, intArrayList);
             notifyDataSetChanged();
         }
     };
+
+
 
 }

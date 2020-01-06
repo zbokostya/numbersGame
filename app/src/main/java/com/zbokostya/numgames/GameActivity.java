@@ -26,14 +26,30 @@ public class GameActivity extends AppCompatActivity {
     private List<Button> buttonsList = new ArrayList<>();
     private ArrayList<Integer> arrInt = new ArrayList<>();
 
+    Button addButton;
+
+    int NUMBER_NUMS = 27;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+
+        addButton = findViewById(R.id.addButtonActivity);
+        addButton.setOnClickListener(oclBtnToAdd);
+
         initRecyclerView();
-        randomNums(18);
-        addButton(18);
+
+        int getGameType = getIntent().getExtras().getInt("TypeOfGameChoosed");
+        if (getGameType == 1) {
+            standartNums();
+        }
+        if (getGameType == 2) {
+            randomNums(NUMBER_NUMS);
+        }
+        addButtons(NUMBER_NUMS);
+
     }
 
     //adapter Init
@@ -45,24 +61,79 @@ public class GameActivity extends AppCompatActivity {
     }
 
     //add Buttons
-    private void addButton(int n) {
+    private void addButtons(int n) {
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         for (int i = 0; i < n; i++) {
             Button btn = new Button(this);
             btn.setHeight(metrics.widthPixels / 9);
             btn.setId(i);
             btn.setText(arrInt.get(i) + "");
+            btn.setBackgroundColor(Color.CYAN);
             buttonsList.add(btn);
         }
         adapter.addItems(buttonsList);
     }
 
-    protected void randomNums(int n) {
+    private void addButton(int cnt) {
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        Button btn = new Button(this);
+        btn.setHeight(metrics.widthPixels / 9);
+        btn.setId(cnt);
+        btn.setText(arrInt.get(cnt) + "");
+        btn.setBackgroundColor(Color.CYAN);
+        buttonsList.add(btn);
+    }
+
+
+    //random init
+    private void randomNums(int n) {
         Random rnd = new Random();
         for (int i = 0; i < n; i++) {
             arrInt.add(rnd.nextInt(8) + 1);
         }
+        adapter.addToIntArr(arrInt);
     }
 
+    //standart init
+    private void standartNums() {
+        for (int i = 0; i < 9; i++) {
+            arrInt.add(i + 1);
+        }
+        for (int i = 0; i < 9; i++) {
+            arrInt.add(1);
+            arrInt.add(i + 1);
+        }
+        adapter.addToIntArr(arrInt);
+    }
 
+    View.OnClickListener oclBtnToAdd = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            arrInt.clear();
+            arrInt.addAll(adapter.getIntArrayList());
+            buttonsList.clear();
+            buttonsList.addAll(adapter.getButtonsArrayList());
+            addButtonsAndNums();
+            adapter.setItems(buttonsList);
+            adapter.setIntArrayList(arrInt);
+        }
+    };
+
+    private void addButtonsAndNums() {
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        int cnt = arrInt.size();
+        int j = 0;
+        for (int i = 0; i < cnt; i++) {
+            if (arrInt.get(i) != 0) {
+                arrInt.add(arrInt.get(i));
+                Button btn = new Button(this);
+                btn.setHeight(metrics.widthPixels / 9);
+                btn.setId(cnt + j);
+                btn.setText(arrInt.get(cnt + j) + "");
+                btn.setBackgroundColor(Color.CYAN);
+                buttonsList.add(btn);
+                j++;
+            }
+        }
+    }
 }
