@@ -101,7 +101,6 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumbersVie
         void bind(Button button) {
             addedButton.setLayoutParams(button.getLayoutParams());
             addedButton.setText(button.getText());
-            addedButton.setTextSize(20);
             addedButton.setBackgroundDrawable(button.getBackground());
             addedButton.setId(button.getId());
             addedButton.setOnClickListener(oclBtn);

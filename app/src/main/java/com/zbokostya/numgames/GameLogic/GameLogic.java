@@ -24,7 +24,7 @@ public class GameLogic {
         }
         return instance;
     }
-
+    private int setBackgroundCrossed = R.drawable.crossed128_128;
     private int idFirstButtonPressed = -1;
 
     private void setLastPressedButtonId(int id) {
@@ -68,8 +68,8 @@ public class GameLogic {
         if (deleteNumbers(idFirstButtonPressed, idSecond, intArrayList)) {
             intArrayList.set(idFirstButtonPressed, 0);
             intArrayList.set(idSecond, 0);
-            btn1.setBackgroundResource(R.drawable.crossed128_128);
-            btn2.setBackgroundResource(R.drawable.crossed128_128);
+            btn1.setBackgroundResource(setBackgroundCrossed);
+            btn2.setBackgroundResource(setBackgroundCrossed);
             buttonsList.set(idFirstButtonPressed, btn1);
             buttonsList.set(idSecond, btn2);
         } else {
