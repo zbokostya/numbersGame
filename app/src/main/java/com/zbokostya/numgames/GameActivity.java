@@ -10,6 +10,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import com.zbokostya.numgames.Adapter.NumberAdapter;
 
@@ -27,6 +28,9 @@ public class GameActivity extends AppCompatActivity {
     private ArrayList<Integer> arrInt = new ArrayList<>();
 
     Button addButton;
+    Button restartButton;
+
+    int getGameType = 1;
 
     int NUMBER_NUMS = 27;
 
@@ -35,22 +39,29 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+        getGameType = getIntent().getExtras().getInt("TypeOfGameChoosed");
+
 
         addButton = findViewById(R.id.addButtonActivity);
         addButton.setOnClickListener(oclBtnToAdd);
 
+
+        restartButton = findViewById(R.id.restartButton);
+        restartButton.setOnClickListener(oclBtnToRestart);
+
+
         initRecyclerView();
 
-        int getGameType = getIntent().getExtras().getInt("TypeOfGameChoosed");
-        if (getGameType == 1) {
-            standartNums();
-        }
-        if (getGameType == 2) {
-            randomNums(NUMBER_NUMS);
-        }
-        addButtons(NUMBER_NUMS);
+        startGame();
 
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        finish();
+    }
+
 
     //adapter Init
     private void initRecyclerView() {
@@ -65,10 +76,10 @@ public class GameActivity extends AppCompatActivity {
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         for (int i = 0; i < n; i++) {
             Button btn = new Button(this);
-            btn.setHeight(metrics.widthPixels / 9);
+            btn.setLayoutParams(new LinearLayout.LayoutParams(metrics.widthPixels / 9, metrics.widthPixels / 9));
             btn.setId(i);
             btn.setText(arrInt.get(i) + "");
-            btn.setBackgroundColor(Color.CYAN);
+            btn.setBackgroundResource(R.drawable.button_border32);
             buttonsList.add(btn);
         }
         adapter.addItems(buttonsList);
@@ -128,12 +139,36 @@ public class GameActivity extends AppCompatActivity {
                 arrInt.add(arrInt.get(i));
                 Button btn = new Button(this);
                 btn.setHeight(metrics.widthPixels / 9);
+                btn.setWidth(metrics.widthPixels / 9);
                 btn.setId(cnt + j);
                 btn.setText(arrInt.get(cnt + j) + "");
-                btn.setBackgroundColor(Color.CYAN);
+                btn.setBackgroundResource(R.drawable.button_border32);
                 buttonsList.add(btn);
                 j++;
             }
         }
     }
+
+
+    private void startGame() {
+        if (getGameType == 1) {
+            standartNums();
+        }
+        if (getGameType == 2) {
+            randomNums(NUMBER_NUMS);
+        }
+        addButtons(NUMBER_NUMS);
+    }
+
+    //onRestart
+    View.OnClickListener oclBtnToRestart = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            adapter.removeAllItems();
+            buttonsList.clear();
+            arrInt.clear();
+            startGame();
+
+        }
+    };
 }

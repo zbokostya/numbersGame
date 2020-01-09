@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import com.zbokostya.numgames.GameActivity;
 import com.zbokostya.numgames.GameLogic.GameLogic;
@@ -41,15 +42,15 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumbersVie
         return buttonsArrayList.size();
     }
 
-    public void addToIntArr(ArrayList<Integer> intArray){
+    public void addToIntArr(ArrayList<Integer> intArray) {
         intArrayList.addAll(intArray);
     }
-
 
     public void addItems(Collection<Button> buttons) {
         buttonsArrayList.addAll(buttons);
         notifyDataSetChanged();
     }
+
     public void setItems(Collection<Button> buttons) {
         buttonsArrayList.clear();
         buttonsArrayList.addAll(buttons);
@@ -65,20 +66,25 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumbersVie
     public void removeItem(int idDeleteButton) {
         buttonsArrayList.remove(idDeleteButton);
         intArrayList.remove(idDeleteButton);
+        notifyDataSetChanged();
     }
 
     public void removeAllItems() {
         buttonsArrayList.clear();
         intArrayList.clear();
+        gameLogic.setIdFirstButtonPressed(-1);
+        notifyDataSetChanged();
     }
 
-    public  ArrayList<Integer> getIntArrayList(){
+    public ArrayList<Integer> getIntArrayList() {
         return intArrayList;
     }
-    public  ArrayList<Button> getButtonsArrayList(){
+
+    public ArrayList<Button> getButtonsArrayList() {
         return buttonsArrayList;
     }
-    public  void setIntArrayList( ArrayList<Integer> intList){
+
+    public void setIntArrayList(ArrayList<Integer> intList) {
         intArrayList.clear();
         intArrayList.addAll(intList);
         notifyDataSetChanged();
@@ -93,8 +99,9 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumbersVie
         }
 
         void bind(Button button) {
-            // addedButton.setHeight(button.getHeight());
+            addedButton.setLayoutParams(button.getLayoutParams());
             addedButton.setText(button.getText());
+            addedButton.setTextSize(20);
             addedButton.setBackgroundDrawable(button.getBackground());
             addedButton.setId(button.getId());
             addedButton.setOnClickListener(oclBtn);
@@ -106,9 +113,11 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumbersVie
         public void onClick(View v) {
             gameLogic.mainActivator(v.getId(), buttonsArrayList, intArrayList);
             notifyDataSetChanged();
+            if(gameLogic.ifGameEnded(intArrayList)){
+
+            }
         }
     };
-
 
 
 }

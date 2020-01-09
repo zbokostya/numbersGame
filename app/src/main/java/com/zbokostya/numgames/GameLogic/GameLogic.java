@@ -1,10 +1,12 @@
 package com.zbokostya.numgames.GameLogic;
 
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.widget.Button;
 
 import com.zbokostya.numgames.GameActivity;
+import com.zbokostya.numgames.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,21 +31,34 @@ public class GameLogic {
         idFirstButtonPressed = id;
     }
 
+    public boolean ifGameEnded(ArrayList<Integer> intArrayList) {
+        for (int el : intArrayList) {
+            if (el != 0) return false;
+        }
+        return true;
+    }
+
+    public void setIdFirstButtonPressed(int n){
+        idFirstButtonPressed = n;
+    }
+
 
     public void mainActivator(int idSecond, ArrayList<Button> buttonsList, ArrayList<Integer> intArrayList) {
-        Log.d("1", idSecond + "" + intArrayList.get(idSecond));
+        //Log.d("1", idSecond + "" + intArrayList.get(idSecond));
         Button btn1;
         Button btn2;
         if (idFirstButtonPressed == -1) {
             btn1 = buttonsList.get(idSecond);
-            btn1.setBackgroundColor(Color.GREEN);
+            //btn1.setBackgroundColor(Color.GREEN);
+            btn1.setTextColor(Color.GREEN);
             buttonsList.set(idSecond, btn1);
             setLastPressedButtonId(idSecond);
             return;
         }
         if (idFirstButtonPressed == idSecond) {
             btn1 = buttonsList.get(idFirstButtonPressed);
-            btn1.setBackgroundColor(Color.CYAN);
+            //btn1.setBackgroundColor(Color.CYAN);
+            btn1.setTextColor(Color.BLACK);
             buttonsList.set(idSecond, btn1);
             idFirstButtonPressed = -1;
             return;
@@ -53,14 +68,12 @@ public class GameLogic {
         if (deleteNumbers(idFirstButtonPressed, idSecond, intArrayList)) {
             intArrayList.set(idFirstButtonPressed, 0);
             intArrayList.set(idSecond, 0);
-            btn1.setBackgroundColor(Color.BLACK);
-            btn2.setBackgroundColor(Color.BLACK);
-            btn1.setText(0 + "");
-            btn2.setText(0 + "");
+            btn1.setBackgroundResource(R.drawable.crossed128_128);
+            btn2.setBackgroundResource(R.drawable.crossed128_128);
             buttonsList.set(idFirstButtonPressed, btn1);
             buttonsList.set(idSecond, btn2);
         } else {
-            btn1.setBackgroundColor(Color.CYAN);
+            //btn1.setBackgroundColor(Color.CYAN);
             buttonsList.set(idFirstButtonPressed, btn1);
         }
         idFirstButtonPressed = -1;
