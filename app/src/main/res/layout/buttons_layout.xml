@@ -8,6 +8,7 @@
     <Button
         android:id="@+id/Button"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:textColor="@android:color/black"/>
 
 </LinearLayout>

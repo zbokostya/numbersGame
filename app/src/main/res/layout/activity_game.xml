@@ -9,6 +9,14 @@
     android:background="#323232">
 
     <Button
+        android:id="@+id/clearRowsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clear rows"
+        app:layout_constraintStart_toEndOf="@+id/addButtonActivity"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
         android:id="@+id/restartButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

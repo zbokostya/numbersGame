@@ -100,10 +100,12 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumbersVie
 
         void bind(Button button) {
             addedButton.setLayoutParams(button.getLayoutParams());
+            //addedButton.setText(button.getText() + " " + button.getId());
             addedButton.setText(button.getText());
             addedButton.setBackgroundDrawable(button.getBackground());
             addedButton.setId(button.getId());
             addedButton.setOnClickListener(oclBtn);
+            addedButton.setPadding(0, 0, 0, 1);
         }
     }
 
@@ -112,11 +114,16 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumbersVie
         public void onClick(View v) {
             gameLogic.mainActivator(v.getId(), buttonsArrayList, intArrayList);
             notifyDataSetChanged();
-            if(gameLogic.ifGameEnded(intArrayList)){
+            if (gameLogic.ifGameEnded(intArrayList)) {
 
             }
         }
     };
+
+    public void clearRows() {
+        gameLogic.clearRows(buttonsArrayList, intArrayList);
+        notifyDataSetChanged();
+    }
 
 
 }

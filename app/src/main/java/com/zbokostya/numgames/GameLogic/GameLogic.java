@@ -2,6 +2,7 @@ package com.zbokostya.numgames.GameLogic;
 
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.DrawableWrapper;
 import android.util.Log;
 import android.widget.Button;
 
@@ -10,6 +11,8 @@ import com.zbokostya.numgames.R;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.core.content.ContextCompat;
 
 
 public class GameLogic {
@@ -24,7 +27,8 @@ public class GameLogic {
         }
         return instance;
     }
-    private int setBackgroundCrossed = R.drawable.crossed128_128;
+
+    private int setBackgroundCrossed = R.drawable.black_crossed;
     private int idFirstButtonPressed = -1;
 
     private void setLastPressedButtonId(int id) {
@@ -38,10 +42,31 @@ public class GameLogic {
         return true;
     }
 
-    public void setIdFirstButtonPressed(int n){
+
+    public void setIdFirstButtonPressed(int n) {
         idFirstButtonPressed = n;
     }
 
+    public void clearRows(ArrayList<Button> buttonsList, ArrayList<Integer> intArrayList) {
+        int size = intArrayList.size();
+        boolean flag = true;
+        for (int i = 0; i < size / 9; i++) {
+            flag = true;
+            for (int j = 0; j < 9; j++) {
+                if (intArrayList.get(i * 9 + j) != 0) {
+                    flag = false;
+                    break;
+                }
+            }
+            if (flag) {
+                for (int j = 0; j < 9; j++) {
+                    intArrayList.remove(i * 9 + j);
+                    buttonsList.remove(i * 9 + j);
+                }
+            }
+        }
+
+    }
 
     public void mainActivator(int idSecond, ArrayList<Button> buttonsList, ArrayList<Integer> intArrayList) {
         //Log.d("1", idSecond + "" + intArrayList.get(idSecond));
@@ -49,8 +74,8 @@ public class GameLogic {
         Button btn2;
         if (idFirstButtonPressed == -1) {
             btn1 = buttonsList.get(idSecond);
-            //btn1.setBackgroundColor(Color.GREEN);
-            btn1.setTextColor(Color.GREEN);
+            btn1.setTextColor(Color.parseColor("#00574B"));
+            btn1.setText(btn1.getText());
             buttonsList.set(idSecond, btn1);
             setLastPressedButtonId(idSecond);
             return;
@@ -58,14 +83,14 @@ public class GameLogic {
         if (idFirstButtonPressed == idSecond) {
             btn1 = buttonsList.get(idFirstButtonPressed);
             //btn1.setBackgroundColor(Color.CYAN);
-            btn1.setTextColor(Color.BLACK);
+            //btn1.setTextColor(Color.BLACK);
             buttonsList.set(idSecond, btn1);
             idFirstButtonPressed = -1;
             return;
         }
         btn1 = buttonsList.get(idFirstButtonPressed);
         btn2 = buttonsList.get(idSecond);
-        if (deleteNumbers(idFirstButtonPressed, idSecond, intArrayList)) {
+        if (delNum(idFirstButtonPressed, idSecond, intArrayList)) {
             intArrayList.set(idFirstButtonPressed, 0);
             intArrayList.set(idSecond, 0);
             btn1.setBackgroundResource(setBackgroundCrossed);
@@ -73,7 +98,7 @@ public class GameLogic {
             buttonsList.set(idFirstButtonPressed, btn1);
             buttonsList.set(idSecond, btn2);
         } else {
-            //btn1.setBackgroundColor(Color.CYAN);
+            //btn1.setBackground(Color.CYAN);
             buttonsList.set(idFirstButtonPressed, btn1);
         }
         idFirstButtonPressed = -1;
@@ -125,74 +150,30 @@ public class GameLogic {
     }
 
 
-
-    /*//buttons id wich pressed
-    private int iDfirstButtonClickedToDel = -1;
-    private int greenButtonId = -1;
-
-    //buttons int array
-    private ArrayList<Integer> arr = new ArrayList<>();
-
-    //random add numbers
-    private void randomNums(int n) {
-        Random rnd = new Random();
-        for (int i = 0; i < n; i++) {
-            arr.add(rnd.nextInt(8) + 1);
+    public boolean delNum(int aId, int bId, ArrayList<Integer> intArrayList) {
+        if (aId == bId) return false;
+        if (aId > bId) {//if aId > bId swap to make | first < second
+            int cnt = aId;
+            aId = bId;
+            bId = cnt;
         }
-    }
-
-    //add numbers
-    private void addNums() {
-        int cnt = arr.size();
-        for (int i = 0; i < cnt; i++) {
-            if (arr.get(i) != 0) {
-                arr.add(arr.get(i));
+        boolean flag = true;
+        if (intArrayList.get(aId).equals(intArrayList.get(bId)) || intArrayList.get(aId) + intArrayList.get(bId) == 10) {
+            if (aId + 1 == bId || aId + 9 == bId) return true;
+            for (int i = 1; aId + i < bId; i++) {
+                if (intArrayList.get(aId + i) != 0) {
+                    flag = false;
+                    break;
+                }
             }
-        }
+            if (flag) return flag;
+            flag = true;
+            if ((bId - aId) % 9 != 0) return false;
+            for (int i = 9; aId + i < bId; i += 9) {
+                if (intArrayList.get(aId + i) != 0) flag = false;
+            }
+            return flag;
+        } else return false;
     }
 
-
-    private void del12(int idButtonSecond) {
-        Button btn1;
-        Button btn2;
-
-        //set first click button id and make green
-        if (iDfirstButtonClickedToDel == -1 && arr.get(idButtonSecond - 256) != 0) {
-            iDfirstButtonClickedToDel = idButtonSecond;
-            greenButtonId = iDfirstButtonClickedToDel;
-            btn1 = findViewById(iDfirstButtonClickedToDel);
-            btn1.setBackgroundColor(Color.GREEN);
-            return;
-        }
-        //make cyan again after green
-        if (greenButtonId == idButtonSecond && iDfirstButtonClickedToDel != -1) {
-            btn1 = findViewById(greenButtonId);
-            btn1.setBackgroundColor(Color.CYAN);
-            iDfirstButtonClickedToDel = -1;
-            greenButtonId = -1;
-            return;
-        }
-        //make first button green
-        btn1 = findViewById(iDfirstButtonClickedToDel);
-        btn2 = findViewById(idButtonSecond);
-        if (iDfirstButtonClickedToDel == -1) return;
-        if (deleteNumbers(iDfirstButtonClickedToDel - 256, idButtonSecond - 256)) {
-            arr.set(idButtonSecond - 256, 0);
-            arr.set(iDfirstButtonClickedToDel - 256, 0);
-            btn1.setText("0");
-            btn1.setBackgroundColor(Color.BLACK);
-            btn2.setText("0");
-            btn2.setBackgroundColor(Color.BLACK);
-            iDfirstButtonClickedToDel = -1;
-        } else {
-            btn1 = findViewById(greenButtonId);
-            btn1.setBackgroundColor(Color.CYAN);
-            iDfirstButtonClickedToDel = -1;
-            greenButtonId = -1;
-        }
-
-    }
-
-
-*/
 }

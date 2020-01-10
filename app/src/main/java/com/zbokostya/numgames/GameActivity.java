@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
@@ -31,6 +33,7 @@ public class GameActivity extends AppCompatActivity {
     private int buttonBackground = R.drawable.button_top_border32;
 
     Button addButton;
+    Button clearRowsButton;
     Button restartButton;
 
     int getGameType = 1;
@@ -40,6 +43,10 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE); //will hide the title
+        getSupportActionBar().hide(); // hide the title bar
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN); //enable full screen
         setContentView(R.layout.activity_game);
 
         getGameType = getIntent().getExtras().getInt("TypeOfGameChoosed");
@@ -48,6 +55,8 @@ public class GameActivity extends AppCompatActivity {
         addButton = findViewById(R.id.addButtonActivity);
         addButton.setOnClickListener(oclBtnToAdd);
 
+        clearRowsButton = findViewById(R.id.clearRowsButton);
+        clearRowsButton.setOnClickListener(oclBtnToClearRows);
 
         restartButton = findViewById(R.id.restartButton);
         restartButton.setOnClickListener(oclBtnToRestart);
@@ -71,9 +80,10 @@ public class GameActivity extends AppCompatActivity {
     //add Buttons
     private void addButtons(int n) {
         DisplayMetrics metrics = getResources().getDisplayMetrics();
-        for (int i = 0; i < n; i++) {
+        int i;
+        for (i = 0; i < n; i++) {
             Button btn = new Button(this);
-            btn.setLayoutParams(new LinearLayout.LayoutParams(metrics.widthPixels / 9, (int)(metrics.widthPixels / 9 * 0.85)));
+            btn.setLayoutParams(new LinearLayout.LayoutParams(metrics.widthPixels / 9, (int) (metrics.widthPixels / 9 * 0.85)));
             btn.setId(i);
             btn.setText(arrInt.get(i) + "");
             btn.setBackgroundResource(buttonBackground);
@@ -91,7 +101,6 @@ public class GameActivity extends AppCompatActivity {
         btn.setBackgroundColor(Color.CYAN);
         buttonsList.add(btn);
     }
-
 
     //random init
     private void randomNums(int n) {
@@ -127,6 +136,17 @@ public class GameActivity extends AppCompatActivity {
         }
     };
 
+    View.OnClickListener oclBtnToClearRows = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            adapter.clearRows();
+            arrInt.clear();
+            arrInt.addAll(adapter.getIntArrayList());
+            buttonsList.clear();
+            buttonsList.addAll(adapter.getButtonsArrayList());
+        }
+    };
+
     private void addButtonsAndNums() {
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         int cnt = arrInt.size();
@@ -135,7 +155,7 @@ public class GameActivity extends AppCompatActivity {
             if (arrInt.get(i) != 0) {
                 arrInt.add(arrInt.get(i));
                 Button btn = new Button(this);
-                btn.setLayoutParams(new LinearLayout.LayoutParams(metrics.widthPixels / 9, (int)(metrics.widthPixels / 9 * 0.85)));
+                btn.setLayoutParams(new LinearLayout.LayoutParams(metrics.widthPixels / 9, (int) (metrics.widthPixels / 9 * 0.85)));
                 btn.setHeight(metrics.widthPixels / 9);
                 btn.setWidth(metrics.widthPixels / 9);
                 btn.setId(cnt + j);
