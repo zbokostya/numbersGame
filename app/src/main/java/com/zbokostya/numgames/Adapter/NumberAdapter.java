@@ -105,7 +105,7 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumbersVie
             addedButton.setBackgroundDrawable(button.getBackground());
             addedButton.setId(button.getId());
             addedButton.setOnClickListener(oclBtn);
-            addedButton.setPadding(0, 0, 0, 1);
+            //addedButton.setPadding(0, 0, 0, 1);
         }
     }
 

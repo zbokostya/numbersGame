@@ -60,8 +60,6 @@ public class GameLogic {
             }
             if (flag) {
                 for (int j = 0; j < 9; j++) {
-                    intArrayList.remove(i * 9 + j);
-                    buttonsList.remove(i * 9 + j);
                 }
             }
         }
@@ -150,7 +148,7 @@ public class GameLogic {
     }
 
 
-    public boolean delNum(int aId, int bId, ArrayList<Integer> intArrayList) {
+    private boolean delNum(int aId, int bId, ArrayList<Integer> intArrayList) {
         if (aId == bId) return false;
         if (aId > bId) {//if aId > bId swap to make | first < second
             int cnt = aId;
