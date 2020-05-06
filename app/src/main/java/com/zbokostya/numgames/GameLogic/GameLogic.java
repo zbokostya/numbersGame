@@ -1,18 +1,12 @@
 package com.zbokostya.numgames.GameLogic;
 
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.DrawableWrapper;
 import android.util.Log;
 import android.widget.Button;
 
-import com.zbokostya.numgames.GameActivity;
 import com.zbokostya.numgames.R;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import androidx.core.content.ContextCompat;
 
 
 public class GameLogic {
@@ -28,12 +22,13 @@ public class GameLogic {
         return instance;
     }
 
-    private int setBackgroundCrossed = R.drawable.black_crossed;
-    private int idFirstButtonPressed = -1;
+    //drawables
+    private int setBackgroundCrossed = R.drawable.button_border32;
+    private int BLACK = Color.BLACK;
+    private int pressedColor = Color.GRAY;
 
-    private void setLastPressedButtonId(int id) {
-        idFirstButtonPressed = id;
-    }
+    private int idFirstButton = -1;
+
 
     public boolean ifGameEnded(ArrayList<Integer> intArrayList) {
         for (int el : intArrayList) {
@@ -43,132 +38,110 @@ public class GameLogic {
     }
 
 
-    public void setIdFirstButtonPressed(int n) {
-        idFirstButtonPressed = n;
+    public void setIdFirstButton(int n) {
+        idFirstButton = n;
     }
 
     public void clearRows(ArrayList<Button> buttonsList, ArrayList<Integer> intArrayList) {
         int size = intArrayList.size();
-        boolean flag = true;
+        boolean flag;
         for (int i = 0; i < size / 9; i++) {
             flag = true;
             for (int j = 0; j < 9; j++) {
-                if (intArrayList.get(i * 9 + j) != 0) {
+                if (!(intArrayList.get(i * 9 + j) == 0 || intArrayList.get(i * 9 + j) == -1)) {
                     flag = false;
                     break;
                 }
             }
             if (flag) {
                 for (int j = 0; j < 9; j++) {
+                    buttonsList.remove(i * 9);
+                    //intArrayList.remove(i * 9);
+                    intArrayList.set(i * 9 + j, -1);//-1 not counting
                 }
             }
         }
-
     }
 
-    public void mainActivator(int idSecond, ArrayList<Button> buttonsList, ArrayList<Integer> intArrayList) {
-        //Log.d("1", idSecond + "" + intArrayList.get(idSecond));
-        Button btn1;
-        Button btn2;
-        if (idFirstButtonPressed == -1) {
-            btn1 = buttonsList.get(idSecond);
-            btn1.setTextColor(Color.parseColor("#00574B"));
-            btn1.setText(btn1.getText());
-            buttonsList.set(idSecond, btn1);
-            setLastPressedButtonId(idSecond);
+    public void mainActivator(int idSecondButton, ArrayList<Button> buttonsList, ArrayList<Integer> intArrayList) {
+        Button firstButton;
+        Button secondButton;
+        //Log.d("text", idSecondButton + "");
+        /*int cnt = 0;
+        for (int i = 0; i < idSecondButton; i++) {
+            if (intArrayList.get(i) == -1) {
+                cnt++;
+            }
+        }
+        idSecondButton -= cnt;*/
+        if (intArrayList.get(idSecondButton) == 0) return;
+        if (idFirstButton == -1) {
+            firstButton = buttonsList.get(idSecondButton);
+            firstButton.setTextColor(pressedColor);
+            buttonsList.set(idSecondButton, firstButton);
+            idFirstButton = idSecondButton;
             return;
         }
-        if (idFirstButtonPressed == idSecond) {
-            btn1 = buttonsList.get(idFirstButtonPressed);
-            //btn1.setBackgroundColor(Color.CYAN);
-            //btn1.setTextColor(Color.BLACK);
-            buttonsList.set(idSecond, btn1);
-            idFirstButtonPressed = -1;
+        if (idFirstButton == idSecondButton) {
+            firstButton = buttonsList.get(idFirstButton);
+            firstButton.setTextColor(BLACK);
+            buttonsList.set(idSecondButton, firstButton);
+            idFirstButton = -1;
             return;
         }
-        btn1 = buttonsList.get(idFirstButtonPressed);
-        btn2 = buttonsList.get(idSecond);
-        if (delNum(idFirstButtonPressed, idSecond, intArrayList)) {
-            intArrayList.set(idFirstButtonPressed, 0);
-            intArrayList.set(idSecond, 0);
-            btn1.setBackgroundResource(setBackgroundCrossed);
-            btn2.setBackgroundResource(setBackgroundCrossed);
-            buttonsList.set(idFirstButtonPressed, btn1);
-            buttonsList.set(idSecond, btn2);
+        firstButton = buttonsList.get(idFirstButton);
+        secondButton = buttonsList.get(idSecondButton);
+
+        firstButton.setTextColor(BLACK);
+        secondButton.setTextColor(BLACK);
+        //idSecondButton+=cnt;
+
+        if (deleteNumbers()) {
+            intArrayList.set(idFirstButton, 0);
+            intArrayList.set(idSecondButton, 0);
+
+            firstButton.setBackgroundResource(setBackgroundCrossed);
+            secondButton.setBackgroundResource(setBackgroundCrossed);
+
+            firstButton.setText(Integer.toString(idFirstButton));
+            secondButton.setText(Integer.toString(idSecondButton));
+
+            buttonsList.set(idFirstButton, firstButton);
+            buttonsList.set(idSecondButton, secondButton);
         } else {
-            //btn1.setBackground(Color.CYAN);
-            buttonsList.set(idFirstButtonPressed, btn1);
+            buttonsList.set(idFirstButton, firstButton);
+            buttonsList.set(idSecondButton, secondButton);
         }
-        idFirstButtonPressed = -1;
+        idFirstButton = -1;
     }
 
-    private boolean deleteNumbers(int aId, int bId, ArrayList<Integer> intArrayList) {
-        if (aId == bId) return false;
-        if (aId > bId) {//if aId > bId swap to make | first < second
-            int cnt = aId;
-            aId = bId;
-            bId = cnt;
-        }
-
-        //Если рядом(сверху вниз)
-        if (bId - 9 == aId && (intArrayList.get(bId).equals(intArrayList.get(aId)) || intArrayList.get(bId) + intArrayList.get(aId) == 10)) {
-            return true;
-        }
-
-
-        //Если рядом(слева на право)
-        if (bId - 1 == aId && (intArrayList.get(bId).equals(intArrayList.get(aId)) || intArrayList.get(bId - 1) + intArrayList.get(aId) == 10)) {
-            return true;
-        }
-
-        boolean flag = true;
-        //проверяем на на наличие нулей между левый и правым
-        for (int j = 0; j <= bId - aId - 2; j++) {
-            if (!(intArrayList.get(aId + 1 + j) == 0)) {
-                flag = false;
-            }
-        }
-        if (flag) {
-            return intArrayList.get(aId) + intArrayList.get(bId) == 10 || intArrayList.get(aId).equals(intArrayList.get(bId));
-        }
-
-        flag = true;
-        //Проверка на нули сверху вниз
-        int j;
-        for (j = 0; j <= bId - aId - 18; j += 9) {
-            if (!(intArrayList.get(aId + 9 + j) == 0)) {
-                flag = false;
-            }
-        }
-        if (flag && j != 0) {
-            return intArrayList.get(aId) + intArrayList.get(bId) == 10 || intArrayList.get(aId).equals(intArrayList.get(bId));
-        }
-
-        return false;
+    private boolean deleteNumbers() {
+        return true;
     }
 
 
-    private boolean delNum(int aId, int bId, ArrayList<Integer> intArrayList) {
-        if (aId == bId) return false;
-        if (aId > bId) {//if aId > bId swap to make | first < second
-            int cnt = aId;
-            aId = bId;
-            bId = cnt;
+    private boolean delNum(int ifFirstButton, int idSecondButton, ArrayList<Integer> numbersButtons) {
+        if (ifFirstButton == idSecondButton) return false;
+        if (ifFirstButton > idSecondButton) {//if aId > bId swap to make | first < second
+            int cnt = ifFirstButton;
+            ifFirstButton = idSecondButton;
+            idSecondButton = cnt;
         }
         boolean flag = true;
-        if (intArrayList.get(aId).equals(intArrayList.get(bId)) || intArrayList.get(aId) + intArrayList.get(bId) == 10) {
-            if (aId + 1 == bId || aId + 9 == bId) return true;
-            for (int i = 1; aId + i < bId; i++) {
-                if (intArrayList.get(aId + i) != 0) {
+        if (numbersButtons.get(ifFirstButton).equals(numbersButtons.get(idSecondButton)) || numbersButtons.get(ifFirstButton) + numbersButtons.get(idSecondButton) == 10) {
+            if (ifFirstButton + 1 == idSecondButton || ifFirstButton + 9 == idSecondButton)
+                return true;
+            for (int i = 1; ifFirstButton + i < idSecondButton; i++) {
+                if (numbersButtons.get(ifFirstButton + i) != 0) {
                     flag = false;
                     break;
                 }
             }
             if (flag) return flag;
             flag = true;
-            if ((bId - aId) % 9 != 0) return false;
-            for (int i = 9; aId + i < bId; i += 9) {
-                if (intArrayList.get(aId + i) != 0) flag = false;
+            if ((idSecondButton - ifFirstButton) % 9 != 0) return false;
+            for (int i = 9; ifFirstButton + i < idSecondButton; i += 9) {
+                if (numbersButtons.get(ifFirstButton + i) != 0) flag = false;
             }
             return flag;
         } else return false;

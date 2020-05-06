@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
 
         gameStandart = findViewById(R.id.ButtonGameStandart);
         gameStandart.setOnClickListener(oclBtnStandart);
-        gameStandart.setTextColor(Color.parseColor("#000000"));
         gameRandom = findViewById(R.id.ButtonGameRandom);
         gameRandom.setOnClickListener(oclBtnRandom);
 

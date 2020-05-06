@@ -1,20 +1,17 @@
 package com.zbokostya.numgames.Adapter;
 
-import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
 
-import com.zbokostya.numgames.GameActivity;
 import com.zbokostya.numgames.GameLogic.GameLogic;
-import com.zbokostya.numgames.MainActivity;
 import com.zbokostya.numgames.R;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -46,7 +43,7 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumbersVie
         intArrayList.addAll(intArray);
     }
 
-    public void addItems(Collection<Button> buttons) {
+    public void addItems(List<Button> buttons) {
         buttonsArrayList.addAll(buttons);
         notifyDataSetChanged();
     }
@@ -72,7 +69,7 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumbersVie
     public void removeAllItems() {
         buttonsArrayList.clear();
         intArrayList.clear();
-        gameLogic.setIdFirstButtonPressed(-1);
+        gameLogic.setIdFirstButton(-1);
         notifyDataSetChanged();
     }
 
@@ -91,28 +88,29 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumbersVie
     }
 
     class NumbersViewHolder extends RecyclerView.ViewHolder {
-        private Button addedButton;
+        private Button elementButton;
 
         NumbersViewHolder(View itemView) {
             super(itemView);
-            addedButton = itemView.findViewById(R.id.Button);
+            elementButton = itemView.findViewById(R.id.Button);
         }
 
         void bind(Button button) {
-            addedButton.setLayoutParams(button.getLayoutParams());
-            //addedButton.setText(button.getText() + " " + button.getId());
-            addedButton.setText(button.getText());
-            addedButton.setBackgroundDrawable(button.getBackground());
-            addedButton.setId(button.getId());
-            addedButton.setOnClickListener(oclBtn);
-            //addedButton.setPadding(0, 0, 0, 1);
+            elementButton.setLayoutParams(button.getLayoutParams());
+            elementButton.setText(button.getText());
+            elementButton.setTextColor(button.getTextColors());
+            elementButton.setBackgroundDrawable(button.getBackground());
+            elementButton.setId(button.getId());
+            elementButton.setOnClickListener(oclBtn);
         }
     }
 
     private View.OnClickListener oclBtn = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            gameLogic.mainActivator(v.getId(), buttonsArrayList, intArrayList);
+            int id = v.getId();
+           // Log.d("te", cnt + "");
+            gameLogic.mainActivator(id, buttonsArrayList, intArrayList);
             notifyDataSetChanged();
             if (gameLogic.ifGameEnded(intArrayList)) {
 
