@@ -2,15 +2,22 @@ package com.zbokostya.numgames.GameLogic;
 
 import android.graphics.Color;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import com.zbokostya.numgames.R;
+import com.zbokostya.numgames.enums.intValues;
 
 import java.util.ArrayList;
+
+import androidx.core.content.ContextCompat;
 
 
 public class GameLogic {
     private static GameLogic instance;
+
+    private int spanCount = intValues.spanCount.getValue();
 
     private GameLogic() {
     }
@@ -23,16 +30,16 @@ public class GameLogic {
     }
 
     //drawables
-    private int setBackgroundCrossed = R.drawable.button_border32;
+    private int setBackgroundCrossed = R.drawable.crossed128_128;
     private int BLACK = Color.BLACK;
-    private int pressedColor = Color.GRAY;
+    private int pressedColor = Color.CYAN;
 
     private int idFirstButton = -1;
 
 
-    public boolean ifGameEnded(ArrayList<Integer> intArrayList) {
+    public boolean isGameEnded(ArrayList<Integer> intArrayList) {
         for (int el : intArrayList) {
-            if (el != 0) return false;
+            if (el != 0 && el != -1) return false;
         }
         return true;
     }
@@ -45,60 +52,63 @@ public class GameLogic {
     public void clearRows(ArrayList<Button> buttonsList, ArrayList<Integer> intArrayList) {
         int size = intArrayList.size();
         boolean flag;
-        for (int i = 0; i < size / 9; i++) {
+        for (int i = 0; i < size / spanCount; i++) {
             flag = true;
-            for (int j = 0; j < 9; j++) {
-                if (!(intArrayList.get(i * 9 + j) == 0 || intArrayList.get(i * 9 + j) == -1)) {
+            for (int j = 0; j < spanCount; j++) {
+                if (intArrayList.get(i * spanCount + j) != 0 && intArrayList.get(i * spanCount + j) != -1) {
                     flag = false;
                     break;
                 }
             }
+            //if already skipped
+            if (buttonsList.get(i * spanCount).getLayoutParams().height == 0) flag = false;
+
             if (flag) {
-                for (int j = 0; j < 9; j++) {
-                    buttonsList.remove(i * 9);
-                    //intArrayList.remove(i * 9);
-                    intArrayList.set(i * 9 + j, -1);//-1 not counting
+                //changed params height to 0
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) buttonsList.get(i * spanCount).getLayoutParams();
+                params.height = 0;
+                params.bottomMargin = 0;
+                for (int j = 0; j < spanCount; j++) {
+                    Button cnt = buttonsList.get(i * spanCount + j);
+                    cnt.setLayoutParams(params);
+                    buttonsList.set(i * spanCount + j, cnt);
+//                    buttonsList.remove(i * spanCount + j);
+                    intArrayList.set(i * spanCount + j, -1);//-1 not counting
                 }
             }
         }
     }
 
-    public void mainActivator(int idSecondButton, ArrayList<Button> buttonsList, ArrayList<Integer> intArrayList) {
+
+    public boolean mainActivator(int idSecondButton, ArrayList<Button> buttons, ArrayList<Integer> buttonsIds) {
         Button firstButton;
         Button secondButton;
-        //Log.d("text", idSecondButton + "");
-        /*int cnt = 0;
-        for (int i = 0; i < idSecondButton; i++) {
-            if (intArrayList.get(i) == -1) {
-                cnt++;
-            }
-        }
-        idSecondButton -= cnt;*/
-        if (intArrayList.get(idSecondButton) == 0) return;
+
+        if (buttonsIds.get(idSecondButton) == 0) return false;
         if (idFirstButton == -1) {
-            firstButton = buttonsList.get(idSecondButton);
-            firstButton.setTextColor(pressedColor);
-            buttonsList.set(idSecondButton, firstButton);
+            firstButton = buttons.get(idSecondButton);
+            firstButton.setTextColor(ContextCompat.getColor(firstButton.getContext(), R.color.colorGreen));
+            buttons.set(idSecondButton, firstButton);
             idFirstButton = idSecondButton;
-            return;
+            return false;
         }
         if (idFirstButton == idSecondButton) {
-            firstButton = buttonsList.get(idFirstButton);
+            firstButton = buttons.get(idFirstButton);
             firstButton.setTextColor(BLACK);
-            buttonsList.set(idSecondButton, firstButton);
+            buttons.set(idSecondButton, firstButton);
             idFirstButton = -1;
-            return;
+            return false;
         }
-        firstButton = buttonsList.get(idFirstButton);
-        secondButton = buttonsList.get(idSecondButton);
+        firstButton = buttons.get(idFirstButton);
+        secondButton = buttons.get(idSecondButton);
 
         firstButton.setTextColor(BLACK);
         secondButton.setTextColor(BLACK);
-        //idSecondButton+=cnt;
 
-        if (deleteNumbers()) {
-            intArrayList.set(idFirstButton, 0);
-            intArrayList.set(idSecondButton, 0);
+        if (ifNumbersCanDelete(firstButton.getId(), secondButton.getId(), buttonsIds)) {
+//        if (true) {
+            buttonsIds.set(idFirstButton, 0);
+            buttonsIds.set(idSecondButton, 0);
 
             firstButton.setBackgroundResource(setBackgroundCrossed);
             secondButton.setBackgroundResource(setBackgroundCrossed);
@@ -106,45 +116,57 @@ public class GameLogic {
             firstButton.setText(Integer.toString(idFirstButton));
             secondButton.setText(Integer.toString(idSecondButton));
 
-            buttonsList.set(idFirstButton, firstButton);
-            buttonsList.set(idSecondButton, secondButton);
-        } else {
-            buttonsList.set(idFirstButton, firstButton);
-            buttonsList.set(idSecondButton, secondButton);
+            buttons.set(idFirstButton, firstButton);
+            buttons.set(idSecondButton, secondButton);
+            idFirstButton = -1;
+            return true;
         }
         idFirstButton = -1;
+        return false;
+
     }
 
-    private boolean deleteNumbers() {
-        return true;
-    }
 
+    private boolean ifNumbersCanDelete(int idFirstButton, int idSecondButton, ArrayList<Integer> numbersButtons) {
+        if (idFirstButton == idSecondButton) return false;
 
-    private boolean delNum(int ifFirstButton, int idSecondButton, ArrayList<Integer> numbersButtons) {
-        if (ifFirstButton == idSecondButton) return false;
-        if (ifFirstButton > idSecondButton) {//if aId > bId swap to make | first < second
-            int cnt = ifFirstButton;
-            ifFirstButton = idSecondButton;
+        if (idFirstButton > idSecondButton) {//if aId > bId swap to make | first < second
+            int cnt = idFirstButton;
+            idFirstButton = idSecondButton;
             idSecondButton = cnt;
         }
+
         boolean flag = true;
-        if (numbersButtons.get(ifFirstButton).equals(numbersButtons.get(idSecondButton)) || numbersButtons.get(ifFirstButton) + numbersButtons.get(idSecondButton) == 10) {
-            if (ifFirstButton + 1 == idSecondButton || ifFirstButton + 9 == idSecondButton)
+        //check if a + b == 10 || a == b
+        if (numbersButtons.get(idFirstButton).equals(numbersButtons.get(idSecondButton))
+                || numbersButtons.get(idFirstButton) + numbersButtons.get(idSecondButton) == 10) {
+
+            //check if close to each other
+            if (idFirstButton + 1 == idSecondButton || idFirstButton + 9 == idSecondButton)
                 return true;
-            for (int i = 1; ifFirstButton + i < idSecondButton; i++) {
-                if (numbersButtons.get(ifFirstButton + i) != 0) {
+            //check if line between numbers is == 0
+            for (int i = idFirstButton + 1; i < idSecondButton; i++) {
+                if (numbersButtons.get(i) != 0) {
                     flag = false;
                     break;
                 }
             }
-            if (flag) return flag;
+            if (flag) return true;
+
+            //check if not in 1 line vertical
+            if ((idSecondButton - idFirstButton) % 9 != 0) return false;
+
             flag = true;
-            if ((idSecondButton - ifFirstButton) % 9 != 0) return false;
-            for (int i = 9; ifFirstButton + i < idSecondButton; i += 9) {
-                if (numbersButtons.get(ifFirstButton + i) != 0) flag = false;
+            //check if not in 1 line horizontal
+            for (int i = idFirstButton + 9; i < idSecondButton; i += 9) {
+                if (numbersButtons.get(i) != 0) {
+                    flag = false;
+                    break;
+                }
             }
             return flag;
-        } else return false;
+        }
+        return false;
     }
 
 }

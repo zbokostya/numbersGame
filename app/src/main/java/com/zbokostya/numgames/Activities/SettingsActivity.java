@@ -1,10 +1,12 @@
-package com.zbokostya.numgames;
+package com.zbokostya.numgames.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
+
+import com.zbokostya.numgames.R;
 
 public class SettingsActivity extends AppCompatActivity {
 

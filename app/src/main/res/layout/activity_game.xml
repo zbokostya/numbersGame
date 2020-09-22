@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorDarkGray"
-    tools:context=".MainActivity">
+    tools:context=".Activities.MainActivity">
+
 
     <Button
         android:id="@+id/addButton"
@@ -52,6 +53,16 @@
         app:layout_constraintStart_toEndOf="@+id/restartButton"
         app:layout_constraintTop_toTopOf="parent" />
 
+<!--    <ToggleButton-->
+<!--        android:id="@+id/infoButton"-->
+<!--        style=""-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:textOff=""-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/hintButton" />-->
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
@@ -60,8 +71,11 @@
         android:paddingBottom="300dp"
         android:scrollbars="vertical"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addButton">
+        app:layout_constraintTop_toBottomOf="@+id/hintButton">
+<!--        app:layout_constraintTop_toBottomOf="@+id/toggleButton">-->
 
     </androidx.recyclerview.widget.RecyclerView>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

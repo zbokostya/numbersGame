@@ -1,18 +1,25 @@
-package com.zbokostya.numgames;
+package com.zbokostya.numgames.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.zbokostya.numgames.Adapter.NumberAdapter;
+import com.zbokostya.numgames.R;
+import com.zbokostya.numgames.enums.intValues;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +29,8 @@ public class GameActivity extends AppCompatActivity {
 
     private NumberAdapter adapter;
     private RecyclerView recyclerView;
+
+
 
     //buttons list
     private List<Button> buttons = new ArrayList<>();
@@ -33,18 +42,26 @@ public class GameActivity extends AppCompatActivity {
     Button clearRowsButton;
     Button restartButton;
 
+    ToggleButton expandButton;
+    TextView gameInfo;
+
     int gameType = 1;// game type
 
-    int NUMBER_NUMS = 25;
+    //total buttons on start
+    private int NUMBER_NUMS = intValues.NUMBER_NUMS.getValue();
+    //buttons in line
+    private int spanCount = intValues.spanCount.getValue();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE); //will hide the title
         getSupportActionBar().hide(); // hide the title bar
+
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN); //enable full screen
         setContentView(R.layout.activity_game);
+
 
         gameType = getIntent().getExtras().getInt("TypeOfGameChoosed");
 
@@ -58,28 +75,35 @@ public class GameActivity extends AppCompatActivity {
         restartButton = findViewById(R.id.restartButton);
         restartButton.setOnClickListener(oclBtnToRestart);
 
+//        expandButton = findViewById(R.id.toggleButton);
+
 
         initRecyclerView();
 
+        //start game
         startGame();
 
     }
 
-
     //adapter Init
     private void initRecyclerView() {
         recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 9));
+        recyclerView.setLayoutManager(new GridLayoutManager(this, spanCount));
         adapter = new NumberAdapter();
         recyclerView.setAdapter(adapter);
     }
 
     //add Buttons
-    private void addButtons(int n) {
+    private void addStartButtons(int n) {
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         for (int i = 0; i < n; i++) {
             Button btn = new Button(this);
-            btn.setLayoutParams(new LinearLayout.LayoutParams(metrics.widthPixels / 9, (int) (metrics.widthPixels / 9 * 0.85)));
+            //width of button
+            //height = 0.85 width
+            int width = metrics.widthPixels / spanCount;
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, (int) (width * 0.85));
+            params.bottomMargin = 2;
+            btn.setLayoutParams(params);
             btn.setId(i);
             btn.setBackgroundResource(buttonBackground);
             String text = Integer.toString(numberButtons.get(i));
@@ -91,7 +115,7 @@ public class GameActivity extends AppCompatActivity {
 
 
     //random init
-    private void randomNums(int n) {
+    private void randomNumbersInit(int n) {
         Random rnd = new Random();
         for (int i = 0; i < n; i++) {
             numberButtons.add(rnd.nextInt(8) + 1);
@@ -99,8 +123,8 @@ public class GameActivity extends AppCompatActivity {
         adapter.addToIntArr(numberButtons);
     }
 
-    //standart init
-    private void standartNums() {
+    //normal init
+    private void normalNumbersInit() {
         for (int i = 0; i < 9; i++) {
             numberButtons.add(i + 1);
         }
@@ -111,22 +135,29 @@ public class GameActivity extends AppCompatActivity {
         adapter.addToIntArr(numberButtons);
     }
 
-
-
-    private void addButtonsAndNums() {
+    //after add clicked
+    private void onAddClickedAddButtonsAndNumbers() {
         DisplayMetrics metrics = getResources().getDisplayMetrics();
-        int cnt = numberButtons.size();
+        int allButtonsNumber = numberButtons.size();
         int j = 0;
-        for (int i = 0; i < cnt; i++) {
-            if (numberButtons.get(i) != 0) {
+//        int clearedNums = 0;
+//        for (int i = 0; i < allButtonsNumber; i++) {
+//            if (numberButtons.get(i) == -1) clearedNums++;
+//        }
+
+        for (int i = 0; i < allButtonsNumber; i++) {
+            if (numberButtons.get(i) != 0 && numberButtons.get(i) != -1) {
                 numberButtons.add(numberButtons.get(i));
                 Button btn = new Button(this);
-                btn.setLayoutParams(new LinearLayout.LayoutParams(metrics.widthPixels / 9, (int) (metrics.widthPixels / 9 * 0.85)));
-                btn.setHeight(metrics.widthPixels / 9);
-                btn.setWidth(metrics.widthPixels / 9);
-                btn.setId(cnt + j);
+                int width = metrics.widthPixels / spanCount;
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, (int) (width * 0.85));
+                params.bottomMargin = 2;
+                btn.setLayoutParams(params);
+//                btn.setHeight(width);
+//                btn.setWidth(width);
+                btn.setId(allButtonsNumber + j);
                 btn.setBackgroundResource(buttonBackground);
-                btn.setText(numberButtons.get(cnt + j) + "");
+                btn.setText(numberButtons.get(allButtonsNumber + j).toString());
                 buttons.add(btn);
                 j++;
             }
@@ -136,24 +167,26 @@ public class GameActivity extends AppCompatActivity {
 
     private void startGame() {
         if (gameType == 1) {
-            standartNums();
+            normalNumbersInit();
         }
         if (gameType == 2) {
-            randomNums(NUMBER_NUMS);
+            randomNumbersInit(NUMBER_NUMS);
         }
-        addButtons(NUMBER_NUMS);
+        addStartButtons(NUMBER_NUMS);
     }
+
     //Add
     View.OnClickListener oclAddButton = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             numberButtons.clear();
-            numberButtons.addAll(adapter.getIntArrayList());
+            numberButtons.addAll(adapter.getIntegerArrayList());
             buttons.clear();
             buttons.addAll(adapter.getButtonsArrayList());
-            addButtonsAndNums();
+
+            onAddClickedAddButtonsAndNumbers();
             adapter.setItems(buttons);
-            adapter.setIntArrayList(numberButtons);
+            adapter.setIntegerArrayList(numberButtons);
         }
     };
 
@@ -163,7 +196,7 @@ public class GameActivity extends AppCompatActivity {
         public void onClick(View v) {
             adapter.clearRows();
             numberButtons.clear();
-            numberButtons.addAll(adapter.getIntArrayList());
+            numberButtons.addAll(adapter.getIntegerArrayList());
             buttons.clear();
             buttons.addAll(adapter.getButtonsArrayList());
         }
@@ -180,5 +213,19 @@ public class GameActivity extends AppCompatActivity {
 
         }
     };
+
+    public void writePrimitiveInternalMemory(String filename, int value) {
+        SharedPreferences preferences = this.getPreferences(Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(filename, value);
+        editor.commit();
+
+    }
+
+    public int readPrimitiveInternalMemoryInteger(String filename) {
+        SharedPreferences preferences = this.getPreferences(Activity.MODE_PRIVATE);
+        return preferences.getInt(filename, 0);
+
+    }
 
 }
