@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -22,6 +23,7 @@ import com.zbokostya.numgames.R;
 import com.zbokostya.numgames.enums.intValues;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -31,9 +33,8 @@ public class GameActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
 
 
-
     //buttons list
-    private List<Button> buttons = new ArrayList<>();
+    public static List<Button> buttons = new ArrayList<>();
     private ArrayList<Integer> numberButtons = new ArrayList<>();
 
     private int buttonBackground = R.drawable.white32;
@@ -41,11 +42,12 @@ public class GameActivity extends AppCompatActivity {
     Button addButton;
     Button clearRowsButton;
     Button restartButton;
+    Button hintButton;
 
     ToggleButton expandButton;
     TextView gameInfo;
 
-    int gameType = 1;// game type
+    int gameType = 3;// game type
 
     //total buttons on start
     private int NUMBER_NUMS = intValues.NUMBER_NUMS.getValue();
@@ -75,6 +77,10 @@ public class GameActivity extends AppCompatActivity {
         restartButton = findViewById(R.id.restartButton);
         restartButton.setOnClickListener(oclBtnToRestart);
 
+        hintButton = findViewById(R.id.hintButton);
+        hintButton.setOnClickListener(oclBtnHint);
+
+
 //        expandButton = findViewById(R.id.toggleButton);
 
 
@@ -83,6 +89,12 @@ public class GameActivity extends AppCompatActivity {
         //start game
         startGame();
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        writePrimitiveInternalMemory("prev", numberButtons);
     }
 
     //adapter Init
@@ -135,6 +147,12 @@ public class GameActivity extends AppCompatActivity {
         adapter.addToIntArr(numberButtons);
     }
 
+
+    private void previousNumbersInit() {
+        numberButtons = readPrimitiveInternalMemoryInteger("prev");
+        adapter.addToIntArr(numberButtons);
+    }
+
     //after add clicked
     private void onAddClickedAddButtonsAndNumbers() {
         DisplayMetrics metrics = getResources().getDisplayMetrics();
@@ -168,11 +186,15 @@ public class GameActivity extends AppCompatActivity {
     private void startGame() {
         if (gameType == 1) {
             normalNumbersInit();
-        }
-        if (gameType == 2) {
+            addStartButtons(NUMBER_NUMS);
+        } else if (gameType == 2) {
             randomNumbersInit(NUMBER_NUMS);
+            addStartButtons(NUMBER_NUMS);
+        } else if (gameType == 3) {
+            previousNumbersInit();
+            addStartButtons(numberButtons.size());
         }
-        addStartButtons(NUMBER_NUMS);
+
     }
 
     //Add
@@ -214,18 +236,37 @@ public class GameActivity extends AppCompatActivity {
         }
     };
 
-    public void writePrimitiveInternalMemory(String filename, int value) {
+    //onHint
+    View.OnClickListener oclBtnHint = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            adapter.hintButton();
+        }
+    };
+
+
+
+    public void writePrimitiveInternalMemory(String key, List<Integer> value) {
+        Integer[] myIntList = value.toArray(new Integer[value.size()]);
+
         SharedPreferences preferences = this.getPreferences(Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(filename, value);
-        editor.commit();
-
+        editor.putString(key, TextUtils.join("‚‗‚", myIntList));
+        editor.apply();
+        Log.d("write", TextUtils.join("‚‗‚", myIntList));
     }
 
-    public int readPrimitiveInternalMemoryInteger(String filename) {
+    public ArrayList<Integer> readPrimitiveInternalMemoryInteger(String key) {
         SharedPreferences preferences = this.getPreferences(Activity.MODE_PRIVATE);
-        return preferences.getInt(filename, 0);
 
+        String[] myList = TextUtils.split(preferences.getString(key, ""), "‚‗‚");
+        ArrayList<String> arrayToList = new ArrayList<>(Arrays.asList(myList));
+        ArrayList<Integer> newList = new ArrayList<>();
+        for (String item : arrayToList)
+            newList.add(Integer.parseInt(item));
+        Log.d("read", newList.toString());
+        return newList;
     }
+
 
 }

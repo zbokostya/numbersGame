@@ -16,6 +16,7 @@ public class MainActivity extends AppCompatActivity {
 
     Button gameNormal;
     Button gameRandom;
+    Button gamePrevious;
 
 
     @Override
@@ -33,6 +34,11 @@ public class MainActivity extends AppCompatActivity {
 
         gameRandom = findViewById(R.id.ButtonGameRandom);
         gameRandom.setOnClickListener(oclBtnRandom);
+
+        gamePrevious = findViewById(R.id.ButtonGamePrevious);
+        gamePrevious.setOnClickListener(oclBtnPrevious);
+
+
 
     }
 

@@ -22,4 +22,12 @@
         app:layout_constraintStart_toEndOf="@+id/ButtonGameStandart"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/ButtonGamePrevious"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Previous"
+        app:layout_constraintStart_toEndOf="@+id/ButtonGameRandom"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

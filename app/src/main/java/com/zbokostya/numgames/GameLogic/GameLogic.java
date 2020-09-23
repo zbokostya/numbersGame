@@ -87,7 +87,7 @@ public class GameLogic {
         if (buttonsIds.get(idSecondButton) == 0) return false;
         if (idFirstButton == -1) {
             firstButton = buttons.get(idSecondButton);
-            firstButton.setTextColor(ContextCompat.getColor(firstButton.getContext(), R.color.colorGreen));
+            firstButton.setTextColor(ContextCompat.getColor(firstButton.getContext(), R.color.colorAccent));
             buttons.set(idSecondButton, firstButton);
             idFirstButton = idSecondButton;
             return false;
@@ -167,6 +167,78 @@ public class GameLogic {
             return flag;
         }
         return false;
+    }
+
+    private int[] hint(ArrayList<Integer> numbersButtons) {
+        int[] rez = new int[2];
+        hintLine(numbersButtons, rez);
+        if (rez[1] != 0) return rez;
+        hintVertical(numbersButtons, rez);
+        Log.d("hint2", rez[0] + " " + rez[1]);
+        return rez;
+    }
+
+    private void hintVertical(ArrayList<Integer> numbersButtons, int[] hint) {
+        for (int i = 0; i < spanCount; i++) {
+            hint[0] = i;
+            Log.d("hintval", hint[0] + "");
+            for (int j = i; j < numbersButtons.size(); j += spanCount) {
+                for (int k = j + spanCount; k < numbersButtons.size(); k += spanCount) {
+                    if (numbersButtons.get(k) != 0 && numbersButtons.get(k) != -1) {
+                        hint[0] = k;
+                        break;
+                    }
+                }
+
+                Log.d("hintval1", hint[0] + "|" + numbersButtons.get(hint[0]));
+                for (int k = hint[0] + spanCount; k < numbersButtons.size(); k += spanCount) {
+                    Log.d("hintval2", hint[0] + "|" + numbersButtons.get(hint[0]) + " " + k + "|" + numbersButtons.get(k));
+                    if (numbersButtons.get(k) != 0 && numbersButtons.get(k) != -1) {
+                        if (numbersButtons.get(hint[0]).equals(numbersButtons.get(k))
+                                || numbersButtons.get(hint[0]) + numbersButtons.get(k) == 10) {
+                            hint[1] = k;
+                            return;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    private void hintLine(ArrayList<Integer> numbersButtons, int[] hint) {
+        for (int i = 0; i < numbersButtons.size(); i++) {
+            if (numbersButtons.get(i) != -1 && numbersButtons.get(i) != 0) {
+                hint[0] = i;
+            }
+
+            for (int j = hint[0] + 1; j < numbersButtons.size(); j++) {
+                if (numbersButtons.get(j) != 0 && numbersButtons.get(j) != -1) {
+                    if (numbersButtons.get(hint[0]).equals(numbersButtons.get(j))
+                            || numbersButtons.get(hint[0]) + numbersButtons.get(j) == 10) {
+                        hint[1] = j;
+                        return;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    public void hint(ArrayList<Integer> numbersButtons, ArrayList<Button> buttonsList) {
+        int[] arr = hint(numbersButtons);
+        Log.d("hint3", arr[0] + " " + arr[1]);
+        if (arr[1] != 0) {
+            Button button1 = buttonsList.get(arr[0]);
+            button1.setTextColor(Color.RED);
+            Button button2 = buttonsList.get(arr[1]);
+            button2.setTextColor(Color.RED);
+            buttonsList.set(arr[0], button1);
+            buttonsList.set(arr[1], button2);
+        }
     }
 
 }

@@ -116,10 +116,12 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumbersVie
             int id = v.getId();
             // Log.d("te", cnt + "");
             boolean isChanged = gameLogic.mainActivator(id, buttonsArrayList, integerArrayList);
+//            notifyItemChanged(id);
+            notifyDataSetChanged();
             if (isChanged) {
                 notifyDataSetChanged();
                 if (gameLogic.isGameEnded(integerArrayList)) {
-                    Intent intent = new Intent (v.getContext(), EndActivity.class);
+                    Intent intent = new Intent(v.getContext(), EndActivity.class);
                     v.getContext().startActivity(intent);
                 }
             }
@@ -128,6 +130,11 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumbersVie
 
     public void clearRows() {
         gameLogic.clearRows(buttonsArrayList, integerArrayList);
+        notifyDataSetChanged();
+    }
+
+    public void hintButton() {
+        gameLogic.hint(integerArrayList, buttonsArrayList);
         notifyDataSetChanged();
     }
 
