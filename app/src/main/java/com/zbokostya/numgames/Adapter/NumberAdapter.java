@@ -5,9 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.zbokostya.numgames.Activities.EndActivity;
-import com.zbokostya.numgames.Activities.GameActivity;
 import com.zbokostya.numgames.GameLogic.GameLogic;
 import com.zbokostya.numgames.R;
 
@@ -19,7 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumbersViewHolder> {
-    private ArrayList<Button> buttonsArrayList = new ArrayList<>();
+    private ArrayList<TextView> buttonsArrayList = new ArrayList<TextView>();
     private ArrayList<Integer> integerArrayList = new ArrayList<>();
 
     private GameLogic gameLogic = GameLogic.getInstance();
@@ -46,17 +46,18 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumbersVie
         integerArrayList.addAll(intArray);
     }
 
-    public void addItems(List<Button> buttons) {
+    public void addItems(List<TextView> buttons) {
         buttonsArrayList.addAll(buttons);
         notifyDataSetChanged();
     }
 
-    public void setItems(Collection<Button> buttons) {
+    public void setItems(Collection<TextView> buttons) {
         buttonsArrayList.clear();
         buttonsArrayList.addAll(buttons);
         notifyDataSetChanged();
     }
 
+    //fixme
     public void addItem(Button button) {
         buttonsArrayList.add(button);
         integerArrayList.add(button.getId());
@@ -80,7 +81,7 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumbersVie
         return integerArrayList;
     }
 
-    public ArrayList<Button> getButtonsArrayList() {
+    public ArrayList<TextView> getButtonsArrayList() {
         return buttonsArrayList;
     }
 
@@ -91,14 +92,14 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumbersVie
     }
 
     class NumbersViewHolder extends RecyclerView.ViewHolder {
-        private Button elementButton;
+        private TextView elementButton;
 
         NumbersViewHolder(View itemView) {
             super(itemView);
-            elementButton = itemView.findViewById(R.id.Button);
+            elementButton = itemView.findViewById(R.id.TextButtonGame);
         }
 
-        void bind(Button button) {
+        void bind(TextView button) {
             elementButton.setLayoutParams(button.getLayoutParams());
             elementButton.setText(button.getText());
             elementButton.setTextColor(button.getTextColors());

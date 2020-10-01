@@ -14,13 +14,15 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.zbokostya.numgames.Adapter.NumberAdapter;
+import com.zbokostya.numgames.GameLogic.GameLogic;
 import com.zbokostya.numgames.R;
-import com.zbokostya.numgames.enums.intValues;
+import com.zbokostya.numgames.enums.IntegerValues;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +36,7 @@ public class GameActivity extends AppCompatActivity {
 
 
     //buttons list
-    public static List<Button> buttons = new ArrayList<>();
+    public static List<TextView> buttons = new ArrayList<>();
     private ArrayList<Integer> numberButtons = new ArrayList<>();
 
     private int buttonBackground = R.drawable.white32;
@@ -44,15 +46,17 @@ public class GameActivity extends AppCompatActivity {
     Button restartButton;
     Button hintButton;
 
+    TextView infoView;
+
     ToggleButton expandButton;
     TextView gameInfo;
 
     int gameType = 3;// game type
 
     //total buttons on start
-    private int NUMBER_NUMS = intValues.NUMBER_NUMS.getValue();
+    private int NUMBER_NUMS = IntegerValues.NUMBER_NUMS.getValue();
     //buttons in line
-    private int spanCount = intValues.spanCount.getValue();
+    private int spanCount = IntegerValues.spanCount.getValue();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +84,11 @@ public class GameActivity extends AppCompatActivity {
         hintButton = findViewById(R.id.hintButton);
         hintButton.setOnClickListener(oclBtnHint);
 
+        expandButton = findViewById(R.id.infoGameNumbersButton);
+        expandButton.setOnCheckedChangeListener(oclExpand);
 
-//        expandButton = findViewById(R.id.toggleButton);
+        infoView = findViewById(R.id.infoView);
+        infoView.setVisibility(View.GONE);
 
 
         initRecyclerView();
@@ -149,8 +156,10 @@ public class GameActivity extends AppCompatActivity {
 
 
     private void previousNumbersInit() {
+        numberButtons.clear();
+        buttons.clear();
         numberButtons = readPrimitiveInternalMemoryInteger("prev");
-        adapter.addToIntArr(numberButtons);
+        adapter.setIntegerArrayList(numberButtons);
     }
 
     //after add clicked
@@ -184,6 +193,7 @@ public class GameActivity extends AppCompatActivity {
 
 
     private void startGame() {
+        adapter.clearRows();
         if (gameType == 1) {
             normalNumbersInit();
             addStartButtons(NUMBER_NUMS);
@@ -231,6 +241,7 @@ public class GameActivity extends AppCompatActivity {
             adapter.removeAllItems();
             buttons.clear();
             numberButtons.clear();
+            gameType = 1;
             startGame();
 
         }
@@ -244,6 +255,24 @@ public class GameActivity extends AppCompatActivity {
         }
     };
 
+    CompoundButton.OnCheckedChangeListener oclExpand = new CompoundButton.OnCheckedChangeListener() {
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            if (isChecked) {
+                infoView.setText(GameLogic.info(numberButtons));
+                infoView.setVisibility(View.VISIBLE);
+            } else {
+                infoView.setVisibility(View.GONE);
+            }
+        }
+    };
+
+
+    View.OnClickListener oclBtnTest = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.d("press", "[ress");
+        }
+    };
 
 
     public void writePrimitiveInternalMemory(String key, List<Integer> value) {
@@ -251,15 +280,15 @@ public class GameActivity extends AppCompatActivity {
 
         SharedPreferences preferences = this.getPreferences(Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(key, TextUtils.join("‚‗‚", myIntList));
+        editor.putString(key, TextUtils.join("‚", myIntList));
         editor.apply();
-        Log.d("write", TextUtils.join("‚‗‚", myIntList));
+        Log.d("write", TextUtils.join("‚", myIntList));
     }
 
     public ArrayList<Integer> readPrimitiveInternalMemoryInteger(String key) {
         SharedPreferences preferences = this.getPreferences(Activity.MODE_PRIVATE);
 
-        String[] myList = TextUtils.split(preferences.getString(key, ""), "‚‗‚");
+        String[] myList = TextUtils.split(preferences.getString(key, ""), "‚");
         ArrayList<String> arrayToList = new ArrayList<>(Arrays.asList(myList));
         ArrayList<Integer> newList = new ArrayList<>();
         for (String item : arrayToList)
